@@ -38,11 +38,11 @@ type Model interface {
 
 // Context is the speech recognition context.
 type Context interface {
-	SetLanguage(string) error // Set the language to use for speech recognition, use "auto" for auto detect language.
-	SetTranslate(bool)        // Set translate flag
-	IsMultilingual() bool     // Return true if the model is multilingual.
-	Language() string         // Get language
-	DetectedLanguage() string // Get detected language
+	SetLanguage(string) error    // Set the language to use for speech recognition, use "auto" for auto detect language.
+	SetTranslate(bool)           // Set translate flag
+	IsMultilingual() bool        // Return true if the model is multilingual.
+	Language() string            // Get language
+	GetDetectedLanguage() string // Get auto detected language
 
 	SetOffset(time.Duration)          // Set offset
 	SetDuration(time.Duration)        // Set duration
@@ -116,4 +116,32 @@ type Token struct {
 	Text       string
 	P          float32
 	Start, End time.Duration
+}
+
+// VAD represents a Voice Activity Detection context
+type VAD interface {
+	// Close releases resources
+	Close() error
+
+	// DetectSpeech returns true if speech is detected in the audio samples
+	DetectSpeech(samples []float32) bool
+
+	// GetProbabilities returns the current VAD probabilities
+	GetProbabilities() []float32
+
+	// SegmentFromSamples segments audio based on speech detection
+	SegmentFromSamples(samples []float32) ([]VADSegment, error)
+
+	// SegmentFromProbabilities segments audio using pre-computed probabilities
+	SegmentFromProbabilities() ([]VADSegment, error)
+}
+
+// VADSegment represents a segment of audio with speech activity
+type VADSegment struct {
+	// Start time in seconds
+	Start time.Duration
+	// End time in seconds
+	End time.Duration
+	// Whether this segment contains speech
+	IsSpeech bool
 }
