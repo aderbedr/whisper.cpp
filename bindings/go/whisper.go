@@ -455,6 +455,33 @@ func Whisper_init_from_buffer_with_params(buffer []byte, params ContextParams) *
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// CONTEXT PARAMS HELPERS
+
+// SetUseGPU enables or disables GPU usage
+func (cp *ContextParams) SetUseGPU(useGPU bool) *ContextParams {
+	cp.use_gpu = C.bool(useGPU)
+	return cp
+}
+
+// SetFlashAttn enables or disables flash attention
+func (cp *ContextParams) SetFlashAttn(flashAttn bool) *ContextParams {
+	cp.flash_attn = C.bool(flashAttn)
+	return cp
+}
+
+// SetGPUDevice sets the CUDA device to use
+func (cp *ContextParams) SetGPUDevice(device int) *ContextParams {
+	cp.gpu_device = C.int(device)
+	return cp
+}
+
+// SetDTWTokenTimestamps enables experimental token-level timestamps with DTW
+func (cp *ContextParams) SetDTWTokenTimestamps(enabled bool) *ContextParams {
+	cp.dtw_token_timestamps = C.bool(enabled)
+	return cp
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // VAD (VOICE ACTIVITY DETECTION)
 
 // Get default VAD parameters

@@ -30,16 +30,37 @@ const (
 ///////////////////////////////////////////////////////////////////////////////
 // LIFECYCLE
 
+// New creates a new whisper model with default parameters (CPU-only)
 func New(path string) (Model, error) {
+	return NewWithParams(path, false, 0, false)
+}
+
+// NewWithGPU creates a new whisper model with GPU enabled
+func NewWithGPU(path string, gpuDevice int, flashAttn bool) (Model, error) {
+	return NewWithParams(path, true, gpuDevice, flashAttn)
+}
+
+// NewWithParams creates a new whisper model with custom parameters
+func NewWithParams(path string, useGPU bool, gpuDevice int, flashAttn bool) (Model, error) {
 	model := new(model)
 	if _, err := os.Stat(path); err != nil {
 		return nil, err
-	} else if ctx := whisper.Whisper_init(path); ctx == nil {
-		return nil, ErrUnableToLoadModel
-	} else {
-		model.ctx = ctx
-		model.path = path
 	}
+
+	// Create context parameters with GPU settings
+	params := whisper.Whisper_context_default_params()
+	params.SetUseGPU(useGPU)
+	params.SetGPUDevice(gpuDevice)
+	params.SetFlashAttn(flashAttn)
+
+	// Initialize context with parameters
+	ctx := whisper.Whisper_init_from_file_with_params(path, params)
+	if ctx == nil {
+		return nil, ErrUnableToLoadModel
+	}
+
+	model.ctx = ctx
+	model.path = path
 
 	// Return success
 	return model, nil

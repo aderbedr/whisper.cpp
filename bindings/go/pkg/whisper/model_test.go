@@ -25,6 +25,42 @@ func TestNew(t *testing.T) {
 	})
 }
 
+func TestNewWithGPU(t *testing.T) {
+	assert := assert.New(t)
+	t.Run("valid model path with GPU", func(t *testing.T) {
+		// Note: This test will pass even without GPU hardware
+		// as the library falls back to CPU if GPU is not available
+		model, err := whisper.NewWithGPU(ModelPath, 0, false)
+		assert.NoError(err)
+		assert.NotNil(model)
+		defer model.Close()
+	})
+}
+
+func TestNewWithParams(t *testing.T) {
+	assert := assert.New(t)
+	t.Run("CPU only", func(t *testing.T) {
+		model, err := whisper.NewWithParams(ModelPath, false, 0, false)
+		assert.NoError(err)
+		assert.NotNil(model)
+		defer model.Close()
+	})
+
+	t.Run("GPU enabled", func(t *testing.T) {
+		model, err := whisper.NewWithParams(ModelPath, true, 0, false)
+		assert.NoError(err)
+		assert.NotNil(model)
+		defer model.Close()
+	})
+
+	t.Run("GPU with flash attention", func(t *testing.T) {
+		model, err := whisper.NewWithParams(ModelPath, true, 0, true)
+		assert.NoError(err)
+		assert.NotNil(model)
+		defer model.Close()
+	})
+}
+
 func TestClose(t *testing.T) {
 	assert := assert.New(t)
 

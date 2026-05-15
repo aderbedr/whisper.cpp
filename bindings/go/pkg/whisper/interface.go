@@ -21,7 +21,8 @@ type ProgressCallback func(int)
 type EncoderBeginCallback func() bool
 
 // Model is the interface to a whisper model. Create a new model with the
-// function whisper.New(string)
+// function whisper.New(string), whisper.NewWithGPU(string, int, bool), or
+// whisper.NewWithParams(string, bool, int, bool)
 type Model interface {
 	io.Closer
 
